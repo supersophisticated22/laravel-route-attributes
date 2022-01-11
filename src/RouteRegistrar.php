@@ -114,6 +114,20 @@ class RouteRegistrar
         $groups = $classRouteAttributes->groups();
 
         foreach ($groups as $group) {
+            if(!$classRouteAttributes->prefix()){
+                foreach (config('route-attributes.prefix') as $key => $prefix){
+                    $key = str_replace(ltrim(base_path()) . '/src/', '', $key);
+                    $key = str_replace(
+                        [DIRECTORY_SEPARATOR, 'App\\', '*'],
+                        ['\\\\', app()->getNamespace(), '.*'],
+                        ucfirst(Str::replaceLast('.php', '', $key))
+                    );
+                    if(preg_match_all('/'.$key.'\\.*/', $class->name)) {
+                        $group['prefix'] = $prefix;
+                    }
+                }
+            }
+            
             $router = $this->router;
             $router->group($group, fn () => $this->registerRoutes($class, $classRouteAttributes));
         }
