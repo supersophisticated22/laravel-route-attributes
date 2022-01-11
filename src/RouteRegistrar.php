@@ -85,7 +85,8 @@ class RouteRegistrar
 
     protected function fullQualifiedClassNameFromFile(SplFileInfo $file): string
     {
-        $class = trim(Str::replaceFirst($this->basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = '/' . trim(Str::replaceFirst($this->basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = str_replace(ltrim(base_path()) . '/src/', '', $class);
 
         $class = str_replace(
             [DIRECTORY_SEPARATOR, 'App\\'],
@@ -93,7 +94,7 @@ class RouteRegistrar
             ucfirst(Str::replaceLast('.php', '', $class))
         );
 
-        return $this->rootNamespace . $class;
+        return $class;
     }
 
     protected function processAttributes(string $className): void
